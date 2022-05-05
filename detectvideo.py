@@ -13,6 +13,7 @@ import cv2
 import numpy as np
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
+from imutils.video import FPS
 
 flags.DEFINE_string('framework', 'tf', '(tf, tflite, trt')
 flags.DEFINE_string('weights', './checkpoints/yolov4-416',
@@ -24,7 +25,7 @@ flags.DEFINE_string('video', './data/road.mp4', 'path to input video')
 flags.DEFINE_float('iou', 0.45, 'iou threshold')
 flags.DEFINE_float('score', 0.25, 'score threshold')
 flags.DEFINE_string('output', None, 'path to output video')
-flags.DEFINE_string('output_format', 'XVID', 'codec used in VideoWriter when saving video to file')
+flags.DEFINE_string('output_format', 'MJPG', 'codec used in VideoWriter when saving video to file, MJPG or XVID')
 flags.DEFINE_boolean('dis_cv2_window', False, 'disable cv2 window during the process') # this is good for the .ipynb
 
 def main(_argv):
@@ -36,7 +37,10 @@ def main(_argv):
     video_path = FLAGS.video
 
     print("Video from: ", video_path )
-    vid = cv2.VideoCapture(video_path)
+    try:
+	    vid = cv2.VideoCapture(int(video_path))
+    except:
+    	vid = cv2.VideoCapture(video_path)
 
     if FLAGS.framework == 'tflite':
         interpreter = tf.lite.Interpreter(model_path=FLAGS.weights)
@@ -58,6 +62,7 @@ def main(_argv):
         out = cv2.VideoWriter(FLAGS.output, codec, fps, (width, height))
 
     frame_id = 0
+    fps = FPS().start()
     while True:
         return_value, frame = vid.read()
         if return_value:
@@ -107,7 +112,8 @@ def main(_argv):
         exec_time = curr_time - prev_time
         result = np.asarray(image)
         info = "time: %.2f ms" %(1000*exec_time)
-        print(info)
+        # print(info)
+        fps.update()
 
         result = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         if not FLAGS.dis_cv2_window:
@@ -119,6 +125,9 @@ def main(_argv):
             out.write(result)
 
         frame_id += 1
+    fps.stop()
+    print("Elasped time: {:.2f}".format(fps.elapsed()))
+    print("FPS: {:.2f}".format(fps.fps()))
 
 if __name__ == '__main__':
     try:
