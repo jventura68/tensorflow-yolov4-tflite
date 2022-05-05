@@ -1,3 +1,7 @@
+#yolov4-tiny to tflite
+Seguimos la propuesta de solución dada en [run yolov4 tflite-int8 model](https://github.com/hunglc007/tensorflow-yolov4-tflite/issues/214)
+
+
 # tensorflow-yolov4-tflite
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
 
