@@ -38,9 +38,9 @@ def main(_argv):
 
     print("Video from: ", video_path )
     try:
-	    vid = cv2.VideoCapture(int(video_path))
+        vid = cv2.VideoCapture(int(video_path))
     except:
-    	vid = cv2.VideoCapture(video_path)
+        vid = cv2.VideoCapture(video_path)
 
     if FLAGS.framework == 'tflite':
         interpreter = tf.lite.Interpreter(model_path=FLAGS.weights)
